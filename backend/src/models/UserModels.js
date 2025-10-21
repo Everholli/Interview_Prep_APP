@@ -27,6 +27,31 @@ const userSchema = new Schema({
   },
 }, { timestamps: true });
 
-const User = mongoose.model('User', userSchema);
+userSchema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            username: this.username,
+            password: this.password
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn:   "15m" ,
+        }
+    )
+}
 
-export default User;
+userSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: "30d"
+        }
+    )
+}
+          
+export const User = mongoose.model("User", userSchema);
