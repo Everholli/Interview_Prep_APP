@@ -4,25 +4,55 @@ import jwt from 'jsonwebtoken';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 
+// const generateToken = async (userId) => {
+//   try {
+//     const user = await User.findById(userId);
+//     if (!user) throw new Error("User not found for token generation");
+
+//     const accessToken = user.generateAccessToken();
+//     const refreshToken = user.generateRefreshToken();
+
+//     user.refreshToken = refreshToken;
+//     await user.save();
+
+//     return { accessToken, refreshToken };
+
+//   } catch (error) {
+    
+//     console.error("Token generation error details:", error);
+//     throw new ApiError("Token generation failed", 500);
+//   }
+// };
 const generateToken = async (userId) => {
   try {
+    console.log("🔹 generateToken called for:", userId);
+
     const user = await User.findById(userId);
+    console.log("🔹 Found user:", user ? user.email : "❌ No user found");
+
     if (!user) throw new Error("User not found for token generation");
+
+    console.log("🔹 Checking for token functions...");
+    console.log("Has accessToken func:", typeof user.generateAccessToken);
+    console.log("Has refreshToken func:", typeof user.generateRefreshToken);
 
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
+    console.log("🔹 Tokens generated successfully");
+
     user.refreshToken = refreshToken;
     await user.save();
 
+    console.log("🔹 Tokens saved");
     return { accessToken, refreshToken };
 
   } catch (error) {
-    
-    console.error("Token generation error details:", error);
+    console.error("❌ Token generation error details:", error);
     throw new ApiError("Token generation failed", 500);
   }
 };
+
 
 const registerUser = async (req, res) => {
   try {
